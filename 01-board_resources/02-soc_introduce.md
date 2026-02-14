@@ -68,3 +68,13 @@ Cortex-A7 **主频1.2~1.6GHz**、28nm工艺、负责普通应用、省电、性�
 | [6] F | F=1 禁止 FIQ，F=0 使能 FIQ |
 | [5] T | 控制指令执行状态，表明本指令是 ARM 指令还是 Thumb 指令 |
 | [4:0] M | 处理器模式控制位 ![指令集状态类型](../images/31-处理器模式位.png) |
+
+# 二、编译器
+## 2.1 推荐Linaro编译器下载
+| 编译器类型 | 说明 | 下载链接 |
+| --------- | ---- | ------- |
+| aarch64-elf | 64 位裸机编译器 | [gcc-linaro-7.5.0-2019.12-x86_64_aarch64-elf](https://releases.linaro.org/components/toolchain/binaries/latest-7/aarch64-elf/gcc-linaro-7.5.0-2019.12-x86_64_aarch64-elf.tar.xz) |
+| aarch64-linux-gnu | 64 位系统编译器 | [gcc-linaro-7.5.0-2019.12-x86_64_aarch64-linux-gnu](https://releases.linaro.org/components/toolchain/binaries/latest-7/aarch64-linux-gnu/gcc-linaro-7.5.0-2019.12-x86_64_aarch64-linux-gnu.tar.xz) |
+| arm-eabi | 32位裸机编译器 | [gcc-linaro-7.5.0-2019.12-x86_64_arm-eabi](https://releases.linaro.org/components/toolchain/binaries/latest-7/arm-eabi/gcc-linaro-7.5.0-2019.12-x86_64_arm-eabi.tar.xz) |
+| arm-linux-gnueabi | 32位系统编译器，软浮点、兼容性好 | [gcc-linaro-7.5.0-2019.12-x86_64_arm-linux-gnueabi](https://releases.linaro.org/components/toolchain/binaries/latest-7/arm-linux-gnueabi/gcc-linaro-7.5.0-2019.12-x86_64_arm-linux-gnueabi.tar.xz) |
+| arm-linux-gnueabihf | 32位系统编译器，硬浮点带FPU、性能最高 | [gcc-linaro-7.5.0-2019.12-x86_64_armeb-linux-gnueabihf](https://releases.linaro.org/components/toolchain/binaries/latest-7/armeb-linux-gnueabihf/gcc-linaro-7.5.0-2019.12-x86_64_armeb-linux-gnueabihf.tar.xz) |
