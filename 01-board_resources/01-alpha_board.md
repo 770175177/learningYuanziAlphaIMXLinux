@@ -33,6 +33,13 @@
 
 ### 2.1.5 BOOT-CFG原理图
 !["BOOT-CFG原理图"](../images/07-BOOT_CFG.png)
+!["BOOT-CFG原理图"](../images/07-BOOT类型选择.png)
+!["BOOT-CFG原理图"](../images/07-BOOTIO的定义.png)
+!["BOOT-CFG原理图"](../images/07-BOOTROM初始化的时钟.png)
+### 2.1.5.1 镜像烧写文件的组成
+IMX6U 最终烧写的不是 bin 文件，而是添加了头信息的 imx 文件，其组成：
+
+
 
 ### 2.1.6 JP1串口U3-RS232-RS485原理图
 !["JP1串口U3-RS232-RS485原理图"](../images/08-JP1串口U3_RS232_RS485.png)

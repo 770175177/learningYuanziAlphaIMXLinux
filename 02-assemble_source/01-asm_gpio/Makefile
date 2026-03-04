@@ -51,7 +51,7 @@ $(TARGET).elf: $(OBJS)
 	@$(CC) $(CFLAGS) -c $< -o $@
 
 .PHONY:
-install:
+burn:
 	@echo "Load to Device $(LOAD_DEV)"
 	chmod +x imxdownload
 	./imxdownload $(TARGET).bin $(LOAD_DEV)
