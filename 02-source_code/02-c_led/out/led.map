@@ -1,0 +1,134 @@
+
+Memory Configuration
+
+Name             Origin             Length             Attributes
+*default*        0x0000000000000000 0xffffffffffffffff
+
+Linker script and memory map
+
+LOAD out/start.o
+LOAD out/led.o
+                0x0000000087800000                . = 0x87800000
+
+.text           0x0000000087800000       0x28
+ *(start.o)
+ *(.text)
+ .text          0x0000000087800000       0x1c out/start.o
+                0x0000000087800000                _start
+ .text          0x000000008780001c        0x0 out/led.o
+ *fill*         0x000000008780001c        0x4 
+ .text.__stub   0x0000000087800020        0x8 linker stubs
+
+.glue_7         0x0000000087800028        0x0
+ .glue_7        0x0000000087800028        0x0 linker stubs
+
+.glue_7t        0x0000000087800028        0x0
+ .glue_7t       0x0000000087800028        0x0 linker stubs
+
+.vfp11_veneer   0x0000000087800028        0x0
+ .vfp11_veneer  0x0000000087800028        0x0 linker stubs
+
+.v4_bx          0x0000000087800028        0x0
+ .v4_bx         0x0000000087800028        0x0 linker stubs
+
+.iplt           0x0000000087800028        0x0
+ .iplt          0x0000000087800028        0x0 out/start.o
+
+.text.clk_enable
+                0x0000000087800028       0x70
+ .text.clk_enable
+                0x0000000087800028       0x70 out/led.o
+                0x0000000087800028                clk_enable
+
+.text.led_init  0x0000000087800098       0x3e
+ .text.led_init
+                0x0000000087800098       0x3e out/led.o
+                0x0000000087800098                led_init
+
+.text.led_on    0x00000000878000d6       0x26
+ .text.led_on   0x00000000878000d6       0x26 out/led.o
+                0x00000000878000d6                led_on
+
+.text.led_off   0x00000000878000fc       0x26
+ .text.led_off  0x00000000878000fc       0x26 out/led.o
+                0x00000000878000fc                led_off
+
+.text.delay_short
+                0x0000000087800122       0x20
+ .text.delay_short
+                0x0000000087800122       0x20 out/led.o
+                0x0000000087800122                delay_short
+
+.text.delay     0x0000000087800142       0x24
+ .text.delay    0x0000000087800142       0x24 out/led.o
+                0x0000000087800142                delay
+
+.text.main      0x0000000087800166       0x26
+ .text.main     0x0000000087800166       0x26 out/led.o
+                0x0000000087800166                main
+
+.rel.dyn        0x000000008780018c        0x0
+ .rel.iplt      0x000000008780018c        0x0 out/start.o
+
+.rodata
+ *(.rodata*)
+
+.data           0x000000008780018c        0x0
+ *(.data)
+ .data          0x000000008780018c        0x0 out/start.o
+ .data          0x000000008780018c        0x0 out/led.o
+                0x000000008780018c                __bss_start = .
+
+.igot.plt       0x000000008780018c        0x0
+ .igot.plt      0x000000008780018c        0x0 out/start.o
+
+.bss            0x000000008780018c        0x0
+ *(.bss)
+ .bss           0x000000008780018c        0x0 out/start.o
+ .bss           0x000000008780018c        0x0 out/led.o
+ *(COMMON)
+                0x000000008780018c                __bss_end = .
+OUTPUT(out/led.elf elf32-littlearm)
+
+.ARM.attributes
+                0x0000000000000000       0x2f
+ .ARM.attributes
+                0x0000000000000000       0x1f out/start.o
+ .ARM.attributes
+                0x000000000000001f       0x33 out/led.o
+
+.comment        0x0000000000000000       0x24
+ .comment       0x0000000000000000       0x24 out/led.o
+                                         0x25 (size before relaxing)
+
+.note.GNU-stack
+                0x0000000000000000        0x0
+ .note.GNU-stack
+                0x0000000000000000        0x0 out/led.o
+
+.debug_line     0x0000000000000000      0x10c
+ .debug_line    0x0000000000000000       0x3d out/start.o
+ .debug_line    0x000000000000003d       0xcf out/led.o
+
+.debug_info     0x0000000000000000      0x14f
+ .debug_info    0x0000000000000000       0x79 out/start.o
+ .debug_info    0x0000000000000079       0xd6 out/led.o
+
+.debug_abbrev   0x0000000000000000       0xba
+ .debug_abbrev  0x0000000000000000       0x14 out/start.o
+ .debug_abbrev  0x0000000000000014       0xa6 out/led.o
+
+.debug_aranges  0x0000000000000000       0x70
+ .debug_aranges
+                0x0000000000000000       0x20 out/start.o
+ .debug_aranges
+                0x0000000000000020       0x50 out/led.o
+
+.debug_ranges   0x0000000000000000       0x40
+ .debug_ranges  0x0000000000000000       0x40 out/led.o
+
+.debug_str      0x0000000000000000      0x126
+ .debug_str     0x0000000000000000      0x126 out/led.o
+
+.debug_frame    0x0000000000000000       0xf8
+ .debug_frame   0x0000000000000000       0xf8 out/led.o
