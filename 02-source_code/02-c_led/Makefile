@@ -13,6 +13,8 @@ LDDDRADDR	:= 0x87800000
 CFLAGS	:= -g \
 		-ffunction-sections \
 		-fdata-sections \
+		-nostdlib \
+		-Wall
 
 LDLAGS	:= -Os \
 		-nostartfiles
