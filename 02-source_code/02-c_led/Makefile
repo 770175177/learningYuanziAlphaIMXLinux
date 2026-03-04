@@ -20,7 +20,7 @@ LDLAGS	:= -Os \
 OUT_DIR	:= out
 TOOLS_DIR	:= ../tools
 
-LOAD_DEV ?= /dev/null
+D 		?= /dev/null
 
 INC		:= 
 
@@ -67,10 +67,10 @@ $(TARGET).elf: $(OBJS)
 
 .PHONY:
 burn:
-	@echo "Load to Device $(LOAD_DEV)"
+	@echo "Load to Device $(D)"
 	chmod +x $(TOOLS_DIR)/imxdownload
-	$(TOOLS_DIR)/imxdownload $(TARGET).bin $(LOAD_DEV)
+	$(TOOLS_DIR)/imxdownload $(TARGET).bin $(D)
 
 .PHONY:
 clean:
-	rm -rf $(OUT_DIR) $(TARGET).bin
+	rm -rf $(OUT_DIR) $(TARGET).bin load.imx
