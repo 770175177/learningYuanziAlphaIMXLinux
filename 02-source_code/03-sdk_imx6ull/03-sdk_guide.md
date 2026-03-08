@@ -22,6 +22,13 @@ CORTEXA/include
     cortexa_gcc.h     // 包含了cmsis_gcc.h，且增加了MRS/MSR/CPSR等相关指令
 devices
     MCIMX6Y2          // 开发板的芯片，包含derivers/lds/utils/MCIMX6Y2.h/start.S等
+        drivers       // 各种驱动，adc/cache/clock/csi/enet/gpc/i2c/iomux/pmu/...
+        gcc           // lds文件及startup文件，含flash/ram
+        utilities     // 有debug_console/io/log/sbrk/str等
+        fsl_device_registers.h  // 包含MCIMX6Y2.h及MCIMX6Y2_features.h
+        MCIMX6Y2_features.h     // 定义本芯片的各个IP的数量
+        MCIMX6Y2.h              // 包含中断号/muxpad相关/adc相关/ahb等地址与配置等
+        system_MCIMX6Y2.x       // 包含irq配置，clock配置，systick等相关函数
 doc
 middleware
     fatfs_0.12c
@@ -30,5 +37,5 @@ middleware
     usb_1.6.3
 rtos/freertos_9.0.0
 tools                 // cmake/imgutil/mfgtools
+Makefile              // 自定义的Makefile，用于将sdk编译成库
 ```
-# 二、

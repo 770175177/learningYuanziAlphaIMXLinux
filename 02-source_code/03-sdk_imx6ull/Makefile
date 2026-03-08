@@ -1,4 +1,4 @@
-TARGET	:= led
+TARGET	:= imu6ull。
 
 CROSS_COMPILE := arm-linux-gnueabihf-
 CC 		:= $(CROSS_COMPILE)gcc
