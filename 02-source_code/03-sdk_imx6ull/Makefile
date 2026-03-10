@@ -1,4 +1,6 @@
-TARGET	:= imu6ull。
+TARGET	:= app
+
+IMXSDK	:= sdk_2.2_MCIM6ULL
 
 CROSS_COMPILE := arm-linux-gnueabihf-
 CC 		:= $(CROSS_COMPILE)gcc
@@ -6,9 +8,6 @@ LD 		:= $(CROSS_COMPILE)ld
 OBJDUMP	:= $(CROSS_COMPILE)objdump
 OBJCOPY	:= $(CROSS_COMPILE)objcopy
 OBJSIZE	:= $(CROSS_COMPILE)size
-
-LDFILE	:= ./imx6ul.ld
-LDDDRADDR	:= 0x87800000
 
 CFLAGS	:= -g \
 		-ffunction-sections \
@@ -26,8 +25,8 @@ D 		?= /dev/null
 
 INC		:= 
 
-SRCS	:= start.s \
-		led.c
+SRCS	:= led.c \
+		
 
 OBJS	:= $(patsubst %.c,%.o,$(patsubst %.s,%.o,$(SRCS)))
 OBJO	:= $(patsubst %.o,$(OUT_DIR)/%.o,$(OBJS))
@@ -35,7 +34,11 @@ DIRS	:= $(dir $(OBJO))
 PWD		:= $(shell pwd)
 
 $(shell for dir in $(DIRS); do if [ ! -d $$dir ]; then mkdir -p $$dir; fi done)
+$(shell $(MAKE) -s -C $(IMXSDK) export_subvar)
 
+include $(IMXSDK)/*.mk
+
+INC		+=  $(IMX_INC)
 
 # $@    规则中的目标集合
 # $%    当目标是函数库的时候表示规则中的目标成员名
@@ -51,12 +54,21 @@ all: $(TARGET).elf
 	@$(OBJCOPY) -O ihex $(OUT_DIR)/$< $(OUT_DIR)/$(TARGET).hex
 	@cp $(OUT_DIR)/$(TARGET).bin ./
 
-$(TARGET).elf: $(OBJS)
+$(TARGET).elf: $(LIBIMX6ULL).a $(OBJS)
 	@echo "Link all, Create ELF File $(OUT_DIR)/$@"
-	@$(LD) $(LDLAGS) $(OBJO) -o $(OUT_DIR)/$@ \
-		-T$(LDFILE) \
+	@$(LD) $(LDLAGS) $(OBJO) $(OUT_DIR)/$(LIBIMX6ULL).a -o $(OUT_DIR)/$@ \
+		-T$(IMXSDK)/$(LDFILE) \
 		-Map $(OUT_DIR)/$(TARGET).map
 	@$(OBJSIZE) $(OUT_DIR)/$@
+
+$(LIBIMX6ULL).a: $(IMXSDK)
+	@echo "Build $(IMXSDK) sdk as library $(LIBIMX6ULL).a and copy to $(OUT_DIR)"
+	@$(MAKE) -C $(IMXSDK) all
+	@cp $(IMXSDK)/$(IMXOUT_DIR)/$(LIBIMX6ULL).a $(OUT_DIR)/
+	@echo "---"
+	@echo "LD file is $(IMXSDK)/$(LDFILE)"
+	@echo "LD addr is $(LDDDRADDR)"
+	@echo "---"
 
 # -c 指定编译源文件
 %.o: %.c
@@ -76,3 +88,4 @@ burn:
 .PHONY:
 clean:
 	rm -rf $(OUT_DIR) $(TARGET).bin load.imx
+	$(MAKE) -C $(IMXSDK) clean
