@@ -1,4 +1,5 @@
-TARGET	:= app
+TARGETS	:= 01-sdk_led \
+		02-sdk_beep \
 
 IMXSDK	:= sdk_2.2_MCIM6ULL
 
@@ -10,23 +11,26 @@ OBJCOPY	:= $(CROSS_COMPILE)objcopy
 OBJSIZE	:= $(CROSS_COMPILE)size
 
 CFLAGS	:= -g \
+		-static \
+		-mcpu=cortex-a7 \
+		-mfpu=neon-vfpv4 \
+		-mfloat-abi=hard \
+
+LDFLAGS	:= -Os \
 		-ffunction-sections \
 		-fdata-sections \
-		-nostdlib \
-		-Wall
+		-Wl,--gc-sections
 
-LDLAGS	:= -Os \
-		-nostartfiles
+LDFLAGS += $(CFLAGS)
 
 OUT_DIR	:= out
 TOOLS_DIR	:= ../tools
 
 D 		?= /dev/null
 
-INC		:= 
+INC		:= $(patsubst %,-I./%,$(TARGETS)) \
 
-SRCS	:= led.c \
-		
+SRCS	:= $(wildcard $(patsubst %,%/*.c,$(TARGETS))) \
 
 OBJS	:= $(patsubst %.c,%.o,$(patsubst %.s,%.o,$(SRCS)))
 OBJO	:= $(patsubst %.o,$(OUT_DIR)/%.o,$(OBJS))
@@ -38,7 +42,7 @@ $(shell $(MAKE) -s -C $(IMXSDK) export_subvar)
 
 include $(IMXSDK)/*.mk
 
-INC		+=  $(IMX_INC)
+INC		+= $(IMX_INC)
 
 # $@    规则中的目标集合
 # $%    当目标是函数库的时候表示规则中的目标成员名
@@ -47,19 +51,20 @@ INC		+=  $(IMX_INC)
 # $^    所有依赖文件的集合，会去重
 # $+    和 $^ 类似，但不会去重
 # $*    目标模式中 % 及之前部分，如目标 test.c，模式 %.c，则 $* 是 test
-all: $(TARGET).elf
-	@echo "Create files $(OUT_DIR)/$(TARGET).asm $(OUT_DIR)/$(TARGET).bin $(OUT_DIR)/$(TARGET).hex"
-	@$(OBJDUMP) -d $(OUT_DIR)/$< > $(OUT_DIR)/$(TARGET).asm
-	@$(OBJCOPY) -O binary -S -g $(OUT_DIR)/$< $(OUT_DIR)/$(TARGET).bin
-	@$(OBJCOPY) -O ihex $(OUT_DIR)/$< $(OUT_DIR)/$(TARGET).hex
-	@cp $(OUT_DIR)/$(TARGET).bin ./
+all: $(TARGETS)
+	@echo "Build Complete!"
 
-$(TARGET).elf: $(LIBIMX6ULL).a $(OBJS)
-	@echo "Link all, Create ELF File $(OUT_DIR)/$@"
-	@$(LD) $(LDLAGS) $(OBJO) $(OUT_DIR)/$(LIBIMX6ULL).a -o $(OUT_DIR)/$@ \
+$(TARGETS): $(LIBIMX6ULL).a $(OBJS)
+	@echo "Link all, Create ELF File $(OUT_DIR)/$@/$@.elf"
+	@$(CC) $(LDFLAGS) $(shell find $(OUT_DIR)/$@/ -name *.o) $(INC) -o $(OUT_DIR)/$@/$@.elf \
+		-L$(OUT_DIR) -l$(patsubst lib%,%,$(LIBIMX6ULL)) \
 		-T$(IMXSDK)/$(LDFILE) \
-		-Map $(OUT_DIR)/$(TARGET).map
-	@$(OBJSIZE) $(OUT_DIR)/$@
+		-Wl,-Map=$(OUT_DIR)/$@/$@.map
+	@$(OBJSIZE) $(OUT_DIR)/$@/$@.elf
+	@echo "Create files $(OUT_DIR)/$@/$@.asm $(OUT_DIR)/$@/$@.bin $(OUT_DIR)/$@/$@.hex"
+	@$(OBJDUMP) -d $(OUT_DIR)/$@/$@.elf > $(OUT_DIR)/$@/$@.asm
+	@$(OBJCOPY) -O binary -S -g $(OUT_DIR)/$@/$@.elf $(OUT_DIR)/$@/$@.bin
+	@$(OBJCOPY) -O ihex $(OUT_DIR)/$@/$@.elf $(OUT_DIR)/$@/$@.hex
 
 $(LIBIMX6ULL).a: $(IMXSDK)
 	@echo "Build $(IMXSDK) sdk as library $(LIBIMX6ULL).a and copy to $(OUT_DIR)"
@@ -68,6 +73,7 @@ $(LIBIMX6ULL).a: $(IMXSDK)
 	@echo "---"
 	@echo "LD file is $(IMXSDK)/$(LDFILE)"
 	@echo "LD addr is $(LDDDRADDR)"
+	@echo "SP addr is $(SPDDRADDR)"
 	@echo "---"
 
 # -c 指定编译源文件
@@ -81,11 +87,11 @@ $(LIBIMX6ULL).a: $(IMXSDK)
 
 .PHONY:
 burn:
-	@echo "Load to Device $(D)"
+	@echo "Load $() to Device $(D)"
 	chmod +x $(TOOLS_DIR)/imxdownload
-	$(TOOLS_DIR)/imxdownload $(TARGET).bin $(D)
+	$(TOOLS_DIR)/imxdownload $(TARGETS).bin $(D)
 
 .PHONY:
 clean:
-	rm -rf $(OUT_DIR) $(TARGET).bin load.imx
+	rm -rf $(OUT_DIR) load.imx
 	$(MAKE) -C $(IMXSDK) clean

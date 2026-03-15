@@ -10,19 +10,20 @@ OBJNM	:= $(CROSS_COMPILE)nm
 OBJDUMP	:= $(CROSS_COMPILE)objdump
 OBJCOPY	:= $(CROSS_COMPILE)objcopy
 
-LDFILE	:= devices/MCIMX6Y2/gcc/MCIMX6Y2xxx08_flash.ld
+LDFILE	:= devices/MCIMX6Y2/gcc/MCIMX6Y2xxx08_ram.ld
 LDDDRADDR	:= 0x87800000
+SPDDRADDR	:= 0x80200000
 
 CFLAGS	:= -DCPU_MCIMX6Y2CVM08 \
+		-DSPDDRADDR=$(SPDDRADDR) \
+		-D__STARTUP_CLEAR_BSS \
 		-g \
 		-Wall \
-		-ffunction-sections \
-		-fdata-sections \
+		-static \
 		-nostdlib \
-		-Wall
-
-LDLAGS	:= -O2 \
-		-nostartfiles
+		-mcpu=cortex-a7 \
+		-mfpu=neon-vfpv4 \
+		-mfloat-abi=hard 
 
 IMXOUT_DIR	:= out
 
@@ -60,9 +61,10 @@ all: $(LIBIMX6ULL).a
 export_subvar:
 	@echo "LDFILE		:= $(LDFILE)" > $(LIBIMX6ULL).mk
 	@echo "LDDDRADDR	:= $(LDDDRADDR)" >> $(LIBIMX6ULL).mk
+	@echo "IMX_INC		:= $(IMX_INC)" >> $(LIBIMX6ULL).mk
+	@echo "SPDDRADDR	:= $(SPDDRADDR)" >> $(LIBIMX6ULL).mk
 	@echo "LIBIMX6ULL	:= $(LIBIMX6ULL)" >> $(LIBIMX6ULL).mk
 	@echo "IMXOUT_DIR	:= $(IMXOUT_DIR)" >> $(LIBIMX6ULL).mk
-	@echo "IMX_INC		:= $(IMX_INC)" >> $(LIBIMX6ULL).mk
 
 # ar rcs 创建库（若不存在）、替换文件、更新索引
 $(LIBIMX6ULL).a: $(OBJS)
