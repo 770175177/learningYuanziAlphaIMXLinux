@@ -54,6 +54,14 @@ INC		+= $(IMX_INC)
 all: $(TARGETS)
 	@echo "Build Complete!"
 
+# -Wl,-Map=$(OUT_DIR)/$@/$@.map，-Wl表示后面的参数传递给链接器，-map表示生成Map文件
+# -Wl,--build-id=none 在链接阶段直接告诉链接器不要生成 Build ID。
+# objcopy -S -g，-S负责剥离符号表和重定位信息，-g则专注于移除调试符号
+#		  --only-section 或 -j，只拷贝特定的段
+#		  -R 选项在生成 .bin 时移除特定的，如.note.gnu.build-id
+# objdump --remove-section 排除特定的段
+# lds 文件的内存布局情况： .section {} > VMA AT LMA，最终生成的 bin 文件是按 LMA 排布
+# 
 $(TARGETS): $(LIBIMX6ULL).a $(OBJS)
 	@echo "Link all, Create ELF File $(OUT_DIR)/$@/$@.elf"
 	@$(CC) $(LDFLAGS) $(shell find $(OUT_DIR)/$@/ -name *.o) $(INC) -o $(OUT_DIR)/$@/$@.elf \
@@ -63,8 +71,9 @@ $(TARGETS): $(LIBIMX6ULL).a $(OBJS)
 	@$(OBJSIZE) $(OUT_DIR)/$@/$@.elf
 	@echo "Create files $(OUT_DIR)/$@/$@.asm $(OUT_DIR)/$@/$@.bin $(OUT_DIR)/$@/$@.hex"
 	@$(OBJDUMP) -d $(OUT_DIR)/$@/$@.elf > $(OUT_DIR)/$@/$@.asm
-	@$(OBJCOPY) -O binary -S -g $(OUT_DIR)/$@/$@.elf $(OUT_DIR)/$@/$@.bin
-	@$(OBJCOPY) -O ihex $(OUT_DIR)/$@/$@.elf $(OUT_DIR)/$@/$@.hex
+	@$(OBJCOPY) -O binary -S -g -R .note.gnu.build-id \
+		$(OUT_DIR)/$@/$@.elf $(OUT_DIR)/$@/$@.bin
+	@hexdump -C $(OUT_DIR)/$@/$@.bin > $(OUT_DIR)/$@/$@.txt
 
 $(LIBIMX6ULL).a: $(IMXSDK)
 	@echo "Build $(IMXSDK) sdk as library $(LIBIMX6ULL).a and copy to $(OUT_DIR)"
