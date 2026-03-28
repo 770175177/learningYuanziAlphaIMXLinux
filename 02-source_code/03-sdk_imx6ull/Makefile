@@ -24,9 +24,11 @@ LDFLAGS	:= -Os \
 LDFLAGS += $(CFLAGS)
 
 OUT_DIR	:= out
-TOOLS_DIR	:= ../tools
+TOOLS_DIR		:= ../tools
+GDBCMD_SCRIPT	:= gdb.script
 
 D 		?= /dev/null
+T       ?= $(firstword $(TARGETS))
 
 INC		:= $(patsubst %,-I./%,$(TARGETS)) \
 
@@ -61,7 +63,6 @@ all: $(TARGETS)
 #		  -R 选项在生成 .bin 时移除特定的，如.note.gnu.build-id
 # objdump --remove-section 排除特定的段
 # lds 文件的内存布局情况： .section {} > VMA AT LMA，最终生成的 bin 文件是按 LMA 排布
-# 
 $(TARGETS): $(LIBIMX6ULL).a $(OBJS)
 	@echo "Link all, Create ELF File $(OUT_DIR)/$@/$@.elf"
 	@$(CC) $(LDFLAGS) $(shell find $(OUT_DIR)/$@/ -name *.o) $(INC) -o $(OUT_DIR)/$@/$@.elf \
@@ -94,11 +95,31 @@ $(LIBIMX6ULL).a: $(IMXSDK)
 	@echo "Create Object File $(OUT_DIR)/$@"
 	@$(CC) $(CFLAGS) -c $< -o $(OUT_DIR)/$@
 
+# -S: 启动即暂停
+# -s: 在1234端口监听GDB
+# -kernel: 要执行的程序
+# -dtb：指定设备树文件
+# -device sd-card,drive=mysdcard：添加设备
+# -append "console=ttymxc0,115200 root=/dev/mmcblk1 rw"：传递给kernel的参数
+.PHONY:
+qemu:
+	@echo "Execute qemu mcimx6ul-evk on port 1234, Ctrl + a -> x to exit"
+	qemu-system-arm -M mcimx6ul-evk -m 512M -kernel \
+		$(OUT_DIR)/01-sdk_led/01-sdk_led.bin -nographic -s -S
+
+.PHONY:
+gdb:
+	@echo "Execute gdb to debug"
+	@echo "set architecture arm\ntar remote $(REMOTE_IP):1234\n \
+		load\nlayout src\n" > \
+		$(OUT_DIR)/$(GDBCMD_SCRIPT)
+	@gdb-multiarch $(OUT_DIR)/01-sdk_led/01-sdk_led.elf -x $(OUT_DIR)/$(GDBCMD_SCRIPT)
+
 .PHONY:
 burn:
-	@echo "Load $() to Device $(D)"
-	chmod +x $(TOOLS_DIR)/imxdownload
-	$(TOOLS_DIR)/imxdownload $(TARGETS).bin $(D)
+	@echo "Load ./$(OUT_DIR)/$(T)/$(T).bin to Device $(D)"
+	@chmod +x $(TOOLS_DIR)/imxdownload
+	@$(TOOLS_DIR)/imxdownload ./$(OUT_DIR)/$(T)/$(T).bin $(D)
 
 .PHONY:
 clean:
