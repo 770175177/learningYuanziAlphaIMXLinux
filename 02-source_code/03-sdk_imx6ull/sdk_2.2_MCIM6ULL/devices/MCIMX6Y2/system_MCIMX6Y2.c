@@ -199,7 +199,7 @@ void SystemInit (void) {
 #endif
 
   L1C_InvalidateInstructionCacheAll();
-  L1C_InvalidateDataCacheAll();
+  // L1C_InvalidateDataCacheAll();
 
   actlr = __get_ACTLR();
   actlr = (actlr | ACTLR_SMP_Msk);       /* Change to SMP mode before enable DCache */
