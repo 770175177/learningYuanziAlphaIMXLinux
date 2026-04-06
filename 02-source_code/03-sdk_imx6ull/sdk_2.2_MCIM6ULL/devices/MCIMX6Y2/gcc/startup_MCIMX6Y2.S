@@ -67,6 +67,10 @@ __isr_vector:
     .type    Reset_Handler, %function
 Reset_Handler:
     cpsid   i               /* Mask interrupts */
+    /* CPSID <iflags> {, #mode} */
+    /* iflags为禁用的中断类型：i-irq/f-fiq/a-asyncAbort */
+    /* mode处理器要切换到的模式: 0x1f-sys模式  */
+    /* 对应的是CPSIE打开中断，cpsid和cpsie中间可以是临界区 */
 
     /* Reset SCTlr Settings */
     mrc     p15, 0, r0, c1, c0, 0     /* Read CP15 System Control register                  */
@@ -78,6 +82,8 @@ Reset_Handler:
     mcr     p15, 0, r0, c1, c0, 0     /* Write value back to CP15 System Control register   */
 
     /* Set up stack for IRQ, System/User and Supervisor Modes */
+    /* cps指令可以设置 CPSR 的低5位（M[4:0]），设置处理器模式 */
+    /* Usr-0x10/FIQ-0x11/IRQ-0x12/SVC-0x13/MON-0x16/ABT-0x17/HYP-0x1a/UND-0x1b/SYS-0x1f */
     cps     #0x12                /* Enter IRQ mode                */
     ldr     sp, =__IStackTop     /* Set up IRQ handler stack      */
 
@@ -133,7 +139,7 @@ Reset_Handler:
 #if 1
 .LC2:
     cmp     r2, r3
-    ittt    lt
+    ittt    lt    /* ITTT LT是Thumb-2指令集,其后最多三条赋予执行条件，这里是小于 */
     ldrlt   r0, [r1], #4
     strlt   r0, [r2], #4
     blt    .LC2
@@ -196,7 +202,8 @@ Reset_Handler:
 #endif /* __STARTUP_CLEAR_BSS */
 
 #ifndef __START
-#define __START _start
+// #define __START _start
+#define __START main
 #endif
 #ifndef __ATOLLIC__
     ldr   r0,=__START

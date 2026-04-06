@@ -717,6 +717,9 @@ FORCEDINLINE __STATIC_INLINE void L1C_InvalidateInstructionCacheAll(void)
   /* BPIALL only affects self core. */
   __MCR(15, 0, 0, 7, 5, 6);
   /* Ensure completion of the invalidation */
+  /* DMB（数据内存屏障），只约束内存访问指令的相对顺序，不保证指令本身执行完成 */
+  /* DSB（数据同步屏障），更严格，保证所有缓存、分支预测和TLB维护操作也需要全部完成 */
+  /* ISB（指令同步屏障），最严格，刷新流水线，指令都从指令cache或内存中重新取出，保证上下文切换 */
   __DSB();
   __ISB();
 }
