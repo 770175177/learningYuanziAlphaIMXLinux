@@ -1,7 +1,7 @@
 TARGETS	:= 01-sdk_led \
 		02-sdk_beep \
 
-IMXSDK	:= sdk_2.2_MCIM6ULL
+IMXSDK	:= sdk_2.2_MCIMX6ULL
 
 CROSS_COMPILE := arm-linux-gnueabihf-
 CC 		:= $(CROSS_COMPILE)gcc
@@ -15,6 +15,7 @@ CFLAGS	:= -g \
 		-mcpu=cortex-a7 \
 		-mfpu=neon-vfpv4 \
 		-mfloat-abi=hard \
+		-DCPU_MCIMX6Y2CVM08
 
 LDFLAGS	:= -Os \
 		-ffunction-sections \
@@ -45,6 +46,9 @@ $(shell $(MAKE) -s -C $(IMXSDK) export_subvar)
 include $(IMXSDK)/*.mk
 
 INC		+= $(patsubst -I.%,-I./$(IMXSDK)%,$(IMX_INC))
+
+# xx:
+# 	@echo $(INC)
 
 # $@    规则中的目标集合
 # $%    当目标是函数库的时候表示规则中的目标成员名
@@ -89,11 +93,11 @@ $(LIBIMX6ULL).a: $(IMXSDK)
 # -c 指定编译源文件
 %.o: %.c
 	@echo "Create Object File $(OUT_DIR)/$@"
-	@$(CC) $(CFLAGS) -c $< -o $(OUT_DIR)/$@
+	@$(CC) $(CFLAGS) $(INC) -c $< -o $(OUT_DIR)/$@
 
 %.o: %.s
 	@echo "Create Object File $(OUT_DIR)/$@"
-	@$(CC) $(CFLAGS) -c $< -o $(OUT_DIR)/$@
+	@$(CC) $(CFLAGS) $(INC) -c $< -o $(OUT_DIR)/$@
 
 # -S: 启动即暂停
 # -s: 在1234端口监听GDB
