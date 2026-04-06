@@ -191,3 +191,17 @@ Key to Flags:
     # 在objcopy时不拷贝.note.gnu.build-id段
     arm-linux-gnueabihf-objcopy -R .note.gnu.build-id
 ```
+
+# 三、适配sdk版本裸机程序
+## 3.1 led
+led软硬件等资料参考: **02-source_code/01-asm_led/01-asm_led_guide.md**
+需要配置：
+1) PAD-IOMUX 配置引脚复用
+2) PAD-CFG 配置引脚属性
+3) PAD-GPIO 配置GPIO相关
+4) CCM 配置CCM时钟
+## 3.2 beep
+本开发板使用的是**有源蜂鸣器**
+低电平导通
+### 3.2.1 蜂鸣器硬件
+![GPIO1_IO00](../../images/56-beep原理图.png)

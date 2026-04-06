@@ -44,7 +44,7 @@ $(shell $(MAKE) -s -C $(IMXSDK) export_subvar)
 
 include $(IMXSDK)/*.mk
 
-INC		+= $(IMX_INC)
+INC		+= $(patsubst -I.%,-I./$(IMXSDK)%,$(IMX_INC))
 
 # $@    规则中的目标集合
 # $%    当目标是函数库的时候表示规则中的目标成员名
