@@ -2,6 +2,8 @@ TARGETS	:= 01-sdk_led \
 		02-sdk_beep \
 
 IMXSDK	:= sdk_2.2_MCIMX6ULL
+IMXBSP	:= sdk_2.2_bsp
+
 
 CROSS_COMPILE := arm-linux-gnueabihf-
 CC 		:= $(CROSS_COMPILE)gcc
@@ -31,12 +33,15 @@ GDBCMD_SCRIPT	:= gdb.script
 D 		?= /dev/null
 T       ?= $(firstword $(TARGETS))
 
-INC		:= $(patsubst %,-I./%,$(TARGETS)) \
-
 SRCS	:= $(wildcard $(patsubst %,%/*.c,$(TARGETS))) \
 
-OBJS	:= $(patsubst %.c,%.o,$(patsubst %.s,%.o,$(SRCS)))
+BSP_SRC	:= $(wildcard $(IMXBSP)/*/*.c) \
+		   $(wildcard $(IMXBSP)/*.c)
+
+OBJS	:= $(patsubst %.c,%.o,$(patsubst %.s,%.o,$(SRCS) $(BSP_SRC)))
+INC		:= $(patsubst %,-I./%,$(dir $(OBJS)))
 OBJO	:= $(patsubst %.o,$(OUT_DIR)/%.o,$(OBJS))
+BSPO	:= $(patsubst %.c,$(OUT_DIR)/%.o,$(BSP_SRC))
 DIRS	:= $(dir $(OBJO))
 PWD		:= $(shell pwd)
 
@@ -45,6 +50,7 @@ $(shell $(MAKE) -s -C $(IMXSDK) export_subvar)
 
 include $(IMXSDK)/*.mk
 
+INC		+= -I./$(IMXBSP)
 INC		+= $(patsubst -I.%,-I./$(IMXSDK)%,$(IMX_INC))
 
 # xx:
@@ -68,8 +74,8 @@ all: $(TARGETS)
 # objdump --remove-section 排除特定的段
 # lds 文件的内存布局情况： .section {} > VMA AT LMA，最终生成的 bin 文件是按 LMA 排布
 $(TARGETS): $(LIBIMX6ULL).a $(OBJS)
-	@echo "Link all, Create ELF File $(OUT_DIR)/$@/$@.elf"
-	@$(CC) $(LDFLAGS) $(shell find $(OUT_DIR)/$@/ -name *.o) $(INC) -o $(OUT_DIR)/$@/$@.elf \
+	@echo "\nLink all, Create ELF File $(OUT_DIR)/$@/$@.elf"
+	@$(CC) $(LDFLAGS) $(shell find $(OUT_DIR)/$@/ -name *.o) $(BSPO) $(INC) -o $(OUT_DIR)/$@/$@.elf \
 		-L$(OUT_DIR) -l$(patsubst lib%,%,$(LIBIMX6ULL)) \
 		-T$(IMXSDK)/$(LDFILE) \
 		-Wl,-Map=$(OUT_DIR)/$@/$@.map

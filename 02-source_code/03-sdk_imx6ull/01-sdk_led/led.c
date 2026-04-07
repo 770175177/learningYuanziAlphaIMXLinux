@@ -16,7 +16,7 @@ Copyright © zuozhongkai Co., Ltd. 1998-2019. All rights reserved.
  * @param 		: 无
  * @return 		: 无
  */
-void clk_enable(void)
+void led_clk_enable(void)
 {
 	CCM_CCGR0 = 0xffffffff;
 	CCM_CCGR1 = 0xffffffff;
@@ -32,7 +32,7 @@ void clk_enable(void)
  * @param 		: 无
  * @return 		: 无
  */
-void led_init(void)
+void led_led_init(void)
 {
 	/* 1、初始化IO复用 */
 	SW_MUX_GPIO1_IO03 = 0x5;	/* 复用为GPIO1_IO03 */
@@ -61,7 +61,7 @@ void led_init(void)
  * @param 		: 无
  * @return 		: 无
  */
-void led_on(void)
+void led_led_on(void)
 {
 	/* 
 	 * 将GPIO1_DR的bit3清零	 
@@ -74,7 +74,7 @@ void led_on(void)
  * @param 		: 无
  * @return 		: 无
  */
-void led_off(void)
+void led_led_off(void)
 {
 	/*    
 	 * 将GPIO1_DR的bit3置1
@@ -87,7 +87,7 @@ void led_off(void)
  * @param - n	: 要延时循环次数(空操作循环次数，模式延时)
  * @return 		: 无
  */
-void delay_short(volatile unsigned int n)
+void led_delay_short(volatile unsigned int n)
 {
 	while(n--){}
 }
@@ -98,11 +98,11 @@ void delay_short(volatile unsigned int n)
  * @param - n	: 要延时的ms数
  * @return 		: 无
  */
-void delay(volatile unsigned int n)
+void led_delay(volatile unsigned int n)
 {
 	while(n--)
 	{
-		delay_short(0x7ff);
+		led_delay_short(0x7ff);
 	}
 }
 
@@ -113,16 +113,16 @@ void delay(volatile unsigned int n)
  */
 int main(void)
 {
-	clk_enable();		/* 使能所有的时钟		 	*/
-	led_init();			/* 初始化led 			*/
+	led_clk_enable();		/* 使能所有的时钟		 	*/
+	led_led_init();			/* 初始化led 			*/
 
 	while(1)			/* 死循环 				*/
 	{	
-		led_off();		/* 关闭LED   			*/
-		delay(200);		/* 延时大约500ms 		*/
+		led_led_off();		/* 关闭LED   			*/
+		led_delay(200);		/* 延时大约500ms 		*/
 
-		led_on();		/* 打开LED		 	*/
-		delay(200);		/* 延时大约500ms 		*/
+		led_led_on();		/* 打开LED		 	*/
+		led_delay(200);		/* 延时大约500ms 		*/
 	}
 
 	return 0;
