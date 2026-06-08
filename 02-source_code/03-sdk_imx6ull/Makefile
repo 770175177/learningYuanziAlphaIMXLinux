@@ -1,5 +1,6 @@
 TARGETS	:= 01-sdk_led \
 		02-sdk_beep \
+		03-sdk_key \
 
 IMXSDK	:= sdk_2.2_MCIMX6ULL
 IMXBSP	:= sdk_2.2_bsp
